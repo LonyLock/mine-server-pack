@@ -74,7 +74,7 @@ def main():
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
         z.writestr('modrinth.index.json', json.dumps(index, ensure_ascii=False, indent=2))
         z.writestr('overrides/config/iris.properties', iris_props)
-    print('\nOK:', out, os.path.getsize(out), 'байт')
+    print('\nOK:', out, os.path.getsize(out), 'bytes')
 
 if __name__ == '__main__':
     main()
