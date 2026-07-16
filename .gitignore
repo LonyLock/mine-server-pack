@@ -1,2 +1,3 @@
 *.mrpack
+*.exe
 __pycache__/
