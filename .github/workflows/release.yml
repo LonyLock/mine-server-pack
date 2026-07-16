@@ -1,0 +1,42 @@
+name: Release
+
+# Пуш тега v* -> сборка .mrpack и установщика -> публикация релиза с обоими файлами.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build .mrpack
+        id: pack
+        shell: pwsh
+        run: |
+          $v = '${{ github.ref_name }}'.TrimStart('v')
+          python scripts/build_mrpack.py $v
+          "version=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Build installer exe
+        shell: pwsh
+        run: scripts/build_exe.ps1
+
+      - name: Create release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = '${{ steps.pack.outputs.version }}'
+          gh release create '${{ github.ref_name }}' `
+            "Mine-Server-Pack-$v.mrpack" `
+            MineServerPack-Setup.exe `
+            --title "Mine Server Pack $v" --generate-notes
